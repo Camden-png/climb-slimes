@@ -8,9 +8,9 @@ This was the last event I hosted as the Davis Game Development and Arts Club Off
 
 ## Contents:
 * *climb-slimes.p8:* the original Lua code for the game
-* *index.html:* the Lua code made webplayer compatible
+* *index.html/index.js:* the Lua code made webplayer compatible
 * *inject.html:* the extra HTML code needed to play MP3s, etc.
-* *inject.py:* a Python script to copy inject.html into index.html
+* *inject.py:* a Python script to put inject.html into index.html
 
 ## How to Play:
 [Click right here](https://camden-png.itch.io/climb-slimes)
