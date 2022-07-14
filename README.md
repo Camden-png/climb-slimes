@@ -1,4 +1,5 @@
 # Climb Slimes
+![](ClimbSlimes.png)
 
 ## About:
 *Help Red stack a tower of their slime brethren to get home!*  
