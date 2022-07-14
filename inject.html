@@ -1,0 +1,199 @@
+<link href = "reset.css" rel = "stylesheet" type = "text/css"/>
+
+<style>
+	#body_0 { visibility: hidden; }
+
+	@font-face {
+        font-family: "pico";
+        src: url(Pico8.ttf);
+        font-style: normal;
+        font-weight: 100;
+    }
+
+	* {
+		color: white;
+		text-align: center;
+		font-family: pico;
+		font-weight: 100;
+		font-size: 24px;
+	}
+
+	#phone {
+		width: 400px;
+		top: 50%;
+		left: 50%;
+		margin-left: -200px;
+		visibility: hidden;
+		position: absolute;
+		text-align: center;
+	}
+
+	#gpios {
+		display: flex;
+		flex-direction: column;
+
+		margin-top: 200px;
+		visibility: hidden;
+	}
+
+	.space { line-height: 2.2; }
+
+	#canvas { box-shadow: 6px 6px 18px black; }
+
+	@media (max-width: 942px) {
+	    #gpios { visibility: hidden !important; }
+	}
+
+	@keyframes black_to_brown {
+		from { background-color: black; }
+		to { background-color: #AB5236; }
+	}
+
+	@keyframes brown_to_purple {
+		from { background-color: #AB5236; }
+		to { background-color: #7E2553; }
+	}
+
+	@keyframes purple_to_light_blue {
+		from { background-color: #7E2553; }
+		to { background-color: #29ADFF; }
+	}
+
+	@keyframes light_blue_to_dark_blue {
+		from { background-color: #29ADFF; }
+		to { background-color: #1D2B53; }
+	}
+
+	@keyframes appear {
+		0% { opacity: 0%; }
+		50% { opacity: 0%; }
+		100% {opacity: 100%; }
+	}
+
+</style>
+
+<div id = "phone">
+	<p>MOBILE NOT</p>
+	<p class = "space">SUPPORTED!</p>
+</div>
+
+<div id = "gpios">
+	<p>BY CAMDEN PETTIJOHN</p>
+	<p class = "space">AND GRANT GELARDI</p>
+</div>
+
+<audio loop id = "audio" src = ""></audio>
+
+<script src = "pico8-gpio-listener.js"></script>
+
+<script>
+	// Animations
+	let animator = " 0.5s normal forwards ease-in-out";
+	function black_to_brown() {
+		document.body.style.animation = "black_to_brown" + animator;
+	}
+
+	function brown_to_purple() {
+		document.body.style.animation = "brown_to_purple" + animator;
+	}
+
+	function purple_to_light_blue() {
+		document.body.style.animation = "purple_to_light_blue" + animator;
+	}
+
+	function light_blue_to_dark_blue() {
+		document.body.style.animation = "light_blue_to_dark_blue" + animator;
+	}
+
+	// Hide it from mobile phones
+	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+		let body = document.body.style.backgroundColor = "#29ADFF";
+		let phone = document.getElementById("phone");
+		phone.style.visibility = "visible";
+	} else {
+		let body = document.getElementById("body_0");
+		body.style.visibility = "visible";
+	}
+
+	(function() {
+		let started = false;
+		let last_level = -1;
+		let gpio = getP8Gpio();
+		gpio.subscribe(function(newIndices) {
+			if (!started) {
+				started = true;
+				game_start();
+			}
+			// Z pressed
+			let level = gpio[0];
+			if (last_level != level) {
+				if (level <= 10) {
+					background(level)
+				}
+				last_level = level;
+			}
+		});
+	})();
+
+	function game_start() {
+		setInterval(spinner, 1);
+		let credits = document.getElementById("gpios");
+		credits.style.animation = "appear 1s normal forwards ease-in-out";
+		credits.style.visibility = "visible";
+	}
+
+	let paused = false;
+	function spinner() {
+		// Music volume
+		let level = pico8_state.sound_volume/256
+		audio.volume = level;
+		// Pause music
+		let state = pico8_state.is_paused
+		if (state == 1 && !paused) {
+			paused = true;
+			play("pause");
+		} else if (state == 0 && paused)  {
+			paused = false;
+			play("last");
+		}
+	}
+
+	// Music controls
+	let audio = document.getElementById("audio");
+	let old_time = null;
+	let old_song = null;
+	function play(song) {
+		let final = song + ".mp3";
+		if (song == "pause") {
+			old_time = audio.currentTime;
+			old_song = audio.src;
+			audio.load();
+			audio.src = final;
+		} else if (song == "last") {
+			audio.load();
+			audio.currentTime = old_time;
+			audio.src = old_song;
+		} else {
+			audio.load();
+			audio.src = final;
+		}
+		audio.play();
+	}
+
+	// Background colors
+	function background(code) {
+		if (code == 1) {
+			play("slime_cave");
+			black_to_brown();
+		} else if (code == 4) {
+			play("slime_surface");
+			brown_to_purple();
+		} else if (code == 7) {
+			play("slime_sky");
+			purple_to_light_blue();
+		} else if (code == 10) {
+			play("slime_space")
+			light_blue_to_dark_blue();
+		}
+	}
+</script>
